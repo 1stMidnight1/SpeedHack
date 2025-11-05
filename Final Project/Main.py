@@ -63,32 +63,55 @@ while running == True:
         if menuopen == False:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
+                    testmatrix = matrix.copy()
                     GameTools.move_right(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != testmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_LEFT:
+                    testmatrix = matrix.copy()
                     GameTools.move_left(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != testmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_UP:
+                    testmatrix = matrix.copy()
                     GameTools.move_up(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != testmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_DOWN:
+                    testmatrix = matrix.copy()
                     GameTools.move_down(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != testmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_ESCAPE:
+                    menustate = "restart"
                     menuopen = True
         elif menuopen == True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     menuopen = False
+                elif event.key == pygame.K_DOWN:
+                    menustate = "exit"
+                elif event.key == pygame.K_UP:
+                    menustate = "restart"
+                elif event.key == pygame.K_RETURN:
+                    if menustate == "exit":
+                        running = False
+                    elif menustate == "restart":
+                        matrix = GameTools.reset()
+                        GameTools.new_tile(matrix)
+                        GameTools.new_tile(matrix)
+                        menuopen = False
+
     screen.fill((0, 0, 0))
     main_background = pygame.image.load("background.png").convert_alpha()
     screen.blit(main_background, (0, 0))
     print_matrix()
+    grid = pygame.image.load("gridoverlay.png").convert_alpha()
+    screen.blit(grid, (0, 0))
+    main_overlay = pygame.image.load("overlay.png").convert_alpha()
+    screen.blit(main_overlay, (0, 0))
     if menuopen == True:
-        MiscTools.menu()
-    main_background = pygame.image.load("overlay.png").convert_alpha()
-    screen.blit(main_background, (0, 0))
-
+        MiscTools.menu(menustate)
     if GameTools.game_over(matrix) == True:
         redoverlay = pygame.Surface((1280, 720))
         redoverlay.fill((255, 0, 0))
@@ -101,6 +124,5 @@ while running == True:
 
     if fadeprogress == 255:
         print("Game Over!")
-        pygame.time.wait(5000)
         running = False
 
