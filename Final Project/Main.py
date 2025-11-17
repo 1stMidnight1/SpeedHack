@@ -86,6 +86,10 @@ while running == True:
     print_matrix()
     if menuopen == True:
         MiscTools.menu()
+        menu_display = pygame.image.load("menutitle.png").convert_alpha()
+        menu_rect = menu_display.get_rect()
+        menu_rect.center = screen.get_rect().center
+        screen.blit(menu_display,(menu_rect.x,50))
     main_background = pygame.image.load("overlay.png").convert_alpha()
     screen.blit(main_background, (0, 0))
 
