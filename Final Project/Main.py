@@ -80,6 +80,7 @@ while running == True:
                     GameTools.new_tile(matrix)
                 elif event.key == pygame.K_ESCAPE:
                     menuopen = True
+
         elif menuopen == True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -105,21 +106,15 @@ while running == True:
                         menuopen = False
                     elif menuexit == True:
                         running = False
+
     screen.fill((0, 0, 0))
     main_background = pygame.image.load("background.png").convert_alpha()
     screen.blit(main_background, (0, 0))
     print_matrix()
-    if menuopen == True:
-        MiscTools.menu()
-        if menurestart == True:
-        menu_display = pygame.image.load("menurestart.png").convert_alpha()
-        elif menuexit == True:
-            menu_display = pygame.image.load("menuexit.png").convert_alpha()
-        menu_rect = menu_display.get_rect()
-        menu_rect.center = screen.get_rect().center
-        screen.blit(menu_display, menu_rect)
+
     main_background = pygame.image.load("overlay.png").convert_alpha()
     screen.blit(main_background, (0, 0))
+
 
     if GameTools.game_over(matrix) == True:
         redoverlay = pygame.Surface((1280, 720))
@@ -128,11 +123,16 @@ while running == True:
         pygame.time.wait(1)
         screen.blit(redoverlay, (0, 0))
         fadeprogress += 1
+        menuopen = True
 
+    if menuopen == True:
+        MiscTools.menu()
+        if menurestart == True:
+            menu_display = pygame.image.load("menurestart.png").convert_alpha()
+        elif menuexit == True:
+            menu_display = pygame.image.load("menuexit.png").convert_alpha()
+        menu_rect = menu_display.get_rect()
+        menu_rect.center = screen.get_rect().center
+        screen.blit(menu_display, menu_rect)
+        
     pygame.display.flip()
-
-    if fadeprogress == 255:
-        print("Game Over!")
-        pygame.time.wait(5000)
-        running = False
-
