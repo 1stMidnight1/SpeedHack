@@ -51,11 +51,15 @@ sound = pygame.mixer.Sound("backgroundmusic.mp3")
 sound.play()
 
 running = True
-fadeprogress = 0
 menuopen = False
+menurestart = True
+menuexit = False
+
+fadeprogress = 0
 GameTools.new_tile(matrix)
 GameTools.new_tile(matrix)
 print_matrix()
+
 while running == True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -80,16 +84,40 @@ while running == True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     menuopen = False
+                elif event.key == pygame.K_UP:
+                    menurestart = True
+                    menuexit = False
+                elif event.key == pygame.K_DOWN:
+                    menurestart = False
+                    menuexit = True
+                elif event.key == pygame.K_RETURN:
+                    if menurestart == True:
+                        matrix = {
+                            11: 0, 12: 0, 13: 0, 14: 0,
+                            21: 0, 22: 0, 23: 0, 24: 0,
+                            31: 0, 32: 0, 33: 0, 34: 0,
+                            41: 0, 42: 0, 43: 0, 44: 0
+                        }
+                        fadeprogress = 0
+                        GameTools.new_tile(matrix)
+                        GameTools.new_tile(matrix)
+                        print_matrix()
+                        menuopen = False
+                    elif menuexit == True:
+                        running = False
     screen.fill((0, 0, 0))
     main_background = pygame.image.load("background.png").convert_alpha()
     screen.blit(main_background, (0, 0))
     print_matrix()
     if menuopen == True:
         MiscTools.menu()
-        menu_display = pygame.image.load("menutitle.png").convert_alpha()
+        if menurestart == True:
+        menu_display = pygame.image.load("menurestart.png").convert_alpha()
+        elif menuexit == True:
+            menu_display = pygame.image.load("menuexit.png").convert_alpha()
         menu_rect = menu_display.get_rect()
         menu_rect.center = screen.get_rect().center
-        screen.blit(menu_display,(menu_rect.x,50))
+        screen.blit(menu_display, menu_rect)
     main_background = pygame.image.load("overlay.png").convert_alpha()
     screen.blit(main_background, (0, 0))
 
