@@ -60,6 +60,14 @@ GameTools.new_tile(matrix)
 GameTools.new_tile(matrix)
 print_matrix()
 
+tutorialtext = [pygame.image.load("tutorial1.png").convert_alpha(),
+                pygame.image.load("tutorial2.png").convert_alpha(),
+                pygame.image.load("tutorial3.png").convert_alpha(),
+                pygame.image.load("tutorial4.png").convert_alpha()]
+tutorialindex = 0
+tutorialcounter = 0
+tutorialend = 100
+
 while running == True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -115,7 +123,6 @@ while running == True:
     main_background = pygame.image.load("overlay.png").convert_alpha()
     screen.blit(main_background, (0, 0))
 
-
     if GameTools.game_over(matrix) == True:
         redoverlay = pygame.Surface((1280, 720))
         redoverlay.fill((255, 0, 0))
@@ -134,5 +141,11 @@ while running == True:
         menu_rect = menu_display.get_rect()
         menu_rect.center = screen.get_rect().center
         screen.blit(menu_display, menu_rect)
-        
+
+    tutorialcounter += 1
+    if tutorialcounter >= tutorialend:
+        tutorialindex = (tutorialindex + 1) % len(tutorialtext)
+        tutorialcounter = 0
+    screen.blit(tutorialtext[tutorialindex], (60, 250))
+
     pygame.display.flip()
