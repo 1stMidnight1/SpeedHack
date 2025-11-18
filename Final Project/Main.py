@@ -144,8 +144,10 @@ while running == True:
 
     tutorialcounter += 1
     if tutorialcounter >= tutorialend:
-        tutorialindex = (tutorialindex + 1) % len(tutorialtext)
+        tutorialindex += 1
         tutorialcounter = 0
+        if tutorialindex >= 4:
+            tutorialindex = 0
     screen.blit(tutorialtext[tutorialindex], (60, 250))
 
     pygame.display.flip()
