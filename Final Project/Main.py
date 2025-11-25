@@ -68,6 +68,10 @@ tutorialindex = 0
 tutorialcounter = 0
 tutorialend = 100
 
+text = ""
+seconds = 0
+status_font = pygame.font.Font("7segments.ttf", 72)
+
 while running == True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -149,5 +153,13 @@ while running == True:
         if tutorialindex >= 4:
             tutorialindex = 0
     screen.blit(tutorialtext[tutorialindex], (60, 250))
+
+    minute = seconds // 60
+    second = seconds % 60
+    text = f'{minute}:{second:02d}'
+    timer_display = status_font.render(text, True, (255, 255, 255))
+    seconds += 1
+    timerdisplay_rect = timer_display.get_rect()
+    screen.blit(timer_display, (1020,170))
 
     pygame.display.flip()
