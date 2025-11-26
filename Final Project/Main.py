@@ -10,6 +10,16 @@ matrix = {
     41: 0, 42: 0, 43: 0, 44: 0
 }
 
+level =  {1: (30, 32), 2: (45, 64), 3: (60, 128), 4: (75, 256), 5: (90, 512)}
+
+dmitri1 = ""
+dmitri2 = ""
+dmitri3 = ""
+dmitri4 = ""
+dmitri5 = ""
+dmitri6 = ""
+dmitri7 = ""
+
 def print_matrix():
     offsetx=320
     offsety=20
@@ -70,7 +80,8 @@ tutorialend = 100
 
 text = ""
 seconds = 0
-status_font = pygame.font.Font("7segments.ttf", 72)
+timer_font = pygame.font.Font("mono.ttf", 64)
+dmitri_font = pygame.font.Font("mono.ttf", 20)
 
 while running == True:
     for event in pygame.event.get():
@@ -124,8 +135,45 @@ while running == True:
     screen.blit(main_background, (0, 0))
     print_matrix()
 
-    main_background = pygame.image.load("overlay.png").convert_alpha()
-    screen.blit(main_background, (0, 0))
+#Max characters per line is 15
+    dmitriscreen = "Home"
+    if dmitriscreen == "Home":
+        dmitri1 = "Press Key to"
+        dmitri2 = "Select Option..."
+        dmitri4 = "1) Tutorial"
+        dmitri5 = "2) Power Ups"
+        dmitri6 = "3) Level Select"
+
+    render1 = dmitri_font.render(dmitri1, True, (255, 255, 255))
+    render2 = dmitri_font.render(dmitri2, True, (255, 255, 255))
+    render3 = dmitri_font.render(dmitri3, True, (255, 255, 255))
+    render4 = dmitri_font.render(dmitri4, True, (255, 255, 255))
+    render5 = dmitri_font.render(dmitri5, True, (255, 255, 255))
+    render6 = dmitri_font.render(dmitri6, True, (255, 255, 255))
+    render7 = dmitri_font.render(dmitri7, True, (255, 255, 255))
+
+    screen.blit(render1, (60, 425))
+    screen.blit(render2, (60, 425+10+render1.get_rect().height))
+    screen.blit(render3, (60, 425+(10+render1.get_rect().height)*2))
+    screen.blit(render4, (60, 425+(10+render1.get_rect().height)*3))
+    screen.blit(render5, (60, 425+(10+render1.get_rect().height)*4))
+    screen.blit(render6, (60, 425+(10+render1.get_rect().height)*5))
+    screen.blit(render7, (60, 425 + (10 + render1.get_rect().height) * 6))
+
+    dmitri1 = ""
+    dmitri2 = ""
+    dmitri3 = ""
+    dmitri4 = ""
+    dmitri5 = ""
+    dmitri6 = ""
+
+    minute = seconds // 60
+    second = seconds % 60
+    text = f'{minute}.{second:02d}'
+    timer_display = timer_font.render(text, True, (255, 255, 255))
+    seconds += 1
+    timerdisplay_rect = timer_display.get_rect()
+    screen.blit(timer_display, (1120-timerdisplay_rect.width/2, 150))
 
     if GameTools.game_over(matrix) == True:
         redoverlay = pygame.Surface((1280, 720))
@@ -133,7 +181,8 @@ while running == True:
         redoverlay.set_alpha(fadeprogress)
         pygame.time.wait(1)
         screen.blit(redoverlay, (0, 0))
-        fadeprogress += 1
+        fadeprogress += 8
+    if fadeprogress >= 256:
         menuopen = True
 
     if menuopen == True:
@@ -142,24 +191,9 @@ while running == True:
             menu_display = pygame.image.load("menurestart.png").convert_alpha()
         elif menuexit == True:
             menu_display = pygame.image.load("menuexit.png").convert_alpha()
-        menu_rect = menu_display.get_rect()
-        menu_rect.center = screen.get_rect().center
-        screen.blit(menu_display, menu_rect)
+        screen.blit(menu_display, (0, 0))
 
-    tutorialcounter += 1
-    if tutorialcounter >= tutorialend:
-        tutorialindex += 1
-        tutorialcounter = 0
-        if tutorialindex >= 4:
-            tutorialindex = 0
-    screen.blit(tutorialtext[tutorialindex], (60, 250))
-
-    minute = seconds // 60
-    second = seconds % 60
-    text = f'{minute}:{second:02d}'
-    timer_display = status_font.render(text, True, (255, 255, 255))
-    seconds += 1
-    timerdisplay_rect = timer_display.get_rect()
-    screen.blit(timer_display, (1020,170))
-
+    main_background = pygame.image.load("overlay.png").convert_alpha()
+    if fadeprogress <= 256:
+        screen.blit(main_background, (0, 0))
     pygame.display.flip()
