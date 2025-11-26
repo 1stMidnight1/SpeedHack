@@ -70,18 +70,32 @@ GameTools.new_tile(matrix)
 GameTools.new_tile(matrix)
 print_matrix()
 
-tutorialtext = [pygame.image.load("tutorial1.png").convert_alpha(),
-                pygame.image.load("tutorial2.png").convert_alpha(),
-                pygame.image.load("tutorial3.png").convert_alpha(),
-                pygame.image.load("tutorial4.png").convert_alpha()]
-tutorialindex = 0
-tutorialcounter = 0
-tutorialend = 100
+dmitritext = [[ ">Press Key to", "Select Option...", "1) Tutorial", "2) DESTROY Powerup", "3) MULTIPLY Powerup"],
+                [">Press Key to", "use the", "arrow keys", "to rearrange", "the matrix_"],
+                [">Press Key to", "use the", "escape key", "to pause and", "resume_"],
+                [">64 matrix","to get to", "level 2", "to use", ''"DESTROY"'', "powerup"],
+                [">128 matrix","to get to", "level 3", "to use", ''"MULTIPLY"'', "powerup"]]
+dmitriindex = 0
+dmitricounter = 0
+dmitriend = 100
+dmitri1 = ""
+dmitri2 = ""
+dmitri3 = ""
+dmitri4 = ""
+dmitri5 = ""
+dmitri6 = ""
+dmitri7 = ""
 
 text = ""
-seconds = 0
+milliseconds = 0
 timer_font = pygame.font.Font("mono.ttf", 64)
-dmitri_font = pygame.font.Font("mono.ttf", 20)
+dmitri_font = pygame.font.Font("mono.ttf", 15)
+
+tutorialopen = False
+
+powerup = ""
+destroy = False
+multiply = False
 
 while running == True:
     for event in pygame.event.get():
@@ -130,19 +144,72 @@ while running == True:
                     elif menuexit == True:
                         running = False
 
+        if tutorialopen == False:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    tutorialopen = True
+        else:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    tutorialopen = False
+
+        for tile in matrix.values():
+            if tile >= 64:
+                destroy = True
+            if tile >= 2048:
+                multiply = True
+                
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_2 and destroy:
+                powerup = "destroy"
+            elif event.key == pygame.K_3 and multiply:
+                powerup = "multiply"
+
+        if event.type == pygame.MOUSEBUTTONDOWN and powerup:
+            offsetx, offsety = 320, 20
+            for tile in matrix:
+                rect = pygame.Rect(offsetx, offsety, 160, 160)
+                if rect.collidepoint(event.pos):
+                    if powerup == "destroy":
+                        matrix[tile] = 0
+                        powerup = ""
+                    elif powerup == "multiply" and 0 < matrix[tile] < 128:
+                        matrix[tile] *= 2
+                        powerup = ""
+                        break
+                elif (tile - 4) % 10 == 0:
+                    offsetx = 320
+                    offsety += 160
+                else:
+                    offsetx += 160
+
+    if tutorialopen == True:
+        tutorial_display = pygame.image.load("tutorialscreen.png").convert_alpha()
+        screen.blit(tutorial_display, (0, 0))
+        pygame.display.flip()
+        continue
+
     screen.fill((0, 0, 0))
     main_background = pygame.image.load("background.png").convert_alpha()
     screen.blit(main_background, (0, 0))
     print_matrix()
 
-#Max characters per line is 15
-    dmitriscreen = "Home"
-    if dmitriscreen == "Home":
-        dmitri1 = "Press Key to"
-        dmitri2 = "Select Option..."
-        dmitri4 = "1) Tutorial"
-        dmitri5 = "2) Power Ups"
-        dmitri6 = "3) Level Select"
+    #Max characters per line is 15
+    dmitricounter += 1
+    if dmitricounter >= dmitriend:
+        dmitriindex += 1
+        dmitricounter = 0
+        if dmitriindex >= len(dmitritext):
+            dmitriindex = 0
+
+    dmitri_display = dmitritext[dmitriindex]
+    dmitri1 = dmitri_display[0]
+    dmitri2 = dmitri_display[1]
+    dmitri3 = dmitri_display[2]
+    dmitri4 = dmitri_display[3]
+    dmitri5 = dmitri_display[4]
+    # dmitri6 = dmitri_display[5]
+    # dmitri7 = dmitri_display[6]
 
     render1 = dmitri_font.render(dmitri1, True, (255, 255, 255))
     render2 = dmitri_font.render(dmitri2, True, (255, 255, 255))
@@ -160,18 +227,11 @@ while running == True:
     screen.blit(render6, (60, 425+(10+render1.get_rect().height)*5))
     screen.blit(render7, (60, 425 + (10 + render1.get_rect().height) * 6))
 
-    dmitri1 = ""
-    dmitri2 = ""
-    dmitri3 = ""
-    dmitri4 = ""
-    dmitri5 = ""
-    dmitri6 = ""
-
-    minute = seconds // 60
-    second = seconds % 60
-    text = f'{minute}.{second:02d}'
+    second = milliseconds // 60
+    millisecond = milliseconds % 60
+    text = f'{second}.{millisecond:02d}'
     timer_display = timer_font.render(text, True, (255, 255, 255))
-    seconds += 1
+    milliseconds += 1
     timerdisplay_rect = timer_display.get_rect()
     screen.blit(timer_display, (1120-timerdisplay_rect.width/2, 150))
 
@@ -196,4 +256,5 @@ while running == True:
     main_background = pygame.image.load("overlay.png").convert_alpha()
     if fadeprogress <= 256:
         screen.blit(main_background, (0, 0))
+
     pygame.display.flip()
