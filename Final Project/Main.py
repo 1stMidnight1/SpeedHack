@@ -1,4 +1,4 @@
-import pygame, random, GameTools, MiscTools
+import pygame, GameTools, MiscTools
 pygame.init()
 screen = pygame.display.set_mode((1280,720))
 pygame.display.set_caption("[SPEEDHACK]")
@@ -13,6 +13,7 @@ matrix = {
 levelkey =  {1: (30, 32), 2: (45, 64), 3: (60, 128), 4: (75, 256), 5: (90, 512), 6: (105, 1024), 7: (120, 2048)}
 clock = pygame.time.Clock()
 
+dt = 0
 blink = 0
 plinks = 0
 level = 1
@@ -22,12 +23,16 @@ running = True
 menuopen = False
 menurestart = True
 menuexit = False
+soundplayed = False
 lfadeprogress = 0
 wfadeprogress = 0
+
 backgroundmusic = pygame.mixer.music.load("backgroundmusic.mp3")
 glassbreak = pygame.mixer.Sound("glassbreak.mp3")
 winsound = pygame.mixer.Sound("winsound.mp3")
 delsound = pygame.mixer.Sound("delete.mp3")
+levelupsound = pygame.mixer.Sound("levelupsound.mp3")
+
 scanlines = pygame.image.load("overlay.png").convert_alpha()
 crosshair = pygame.image.load("crosshair.png").convert_alpha()
 failoverlay = pygame.image.load("failoverlay.png").convert_alpha()
@@ -36,7 +41,12 @@ cheatoverlay = pygame.image.load("cheatoverlay.png").convert_alpha()
 main_background = pygame.image.load("background.png").convert_alpha()
 menurestartimage = pygame.image.load("menurestart.png").convert_alpha()
 menuexitimage = pygame.image.load("menuexit.png").convert_alpha()
-soundplayed = False
+tutorial_display = pygame.image.load("tutorialscreen.png").convert_alpha()
+
+timer_font = pygame.font.Font("mono.ttf", 64)
+objective_font = pygame.font.Font("mono.ttf", 32)
+dmitri_font = pygame.font.Font("mono.ttf", 18)
+font = pygame.font.Font("7segments.ttf", 72)
 
 def print_matrix():
     offsetx=320
@@ -60,7 +70,6 @@ def print_matrix():
         rect = pygame.Rect(offsetx, offsety, 160, 160)
         surf = pygame.Surface((rect.w, rect.h), pygame.SRCALPHA)
         surf.fill((colors[matrix[element]]))
-        font = pygame.font.Font("7segments.ttf", 72)
         font.set_bold(True)
         if matrix[element] == 0:
             text = font.render(str(matrix[element]), True, (15, 35, 15))
@@ -100,9 +109,6 @@ gameover = False
 win = False
 text = ""
 msleft = (levelkey[level][0])*1000
-timer_font = pygame.font.Font("mono.ttf", 64)
-objective_font = pygame.font.Font("mono.ttf", 32)
-dmitri_font = pygame.font.Font("mono.ttf", 18)
 
 delthreshold = 32
 multthreshold = 1
@@ -121,7 +127,7 @@ while running == True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if menuopen == False and tutorialopen == False and levelup == False:
+        if menuopen == False and tutorialopen == False and levelup == False and win == False and gameover == False:
             if event.type == pygame.MOUSEBUTTONDOWN and powerup:
                 offsetx, offsety = 320, 20
                 for tile in matrix:
@@ -148,17 +154,25 @@ while running == True:
                             matrix[tile] *= 2
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
+                    oldmatrix = matrix.copy()
                     GameTools.move_right(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != oldmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_LEFT:
+                    oldmatrix = matrix.copy()
                     GameTools.move_left(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != oldmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_UP:
+                    oldmatrix = matrix.copy()
                     GameTools.move_up(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != oldmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_DOWN:
+                    oldmatrix = matrix.copy()
                     GameTools.move_down(matrix)
-                    GameTools.new_tile(matrix)
+                    if matrix != oldmatrix:
+                        GameTools.new_tile(matrix)
                 elif event.key == pygame.K_c:
                     if cheats == True:
                         cheats = False
@@ -193,6 +207,7 @@ while running == True:
                         level = 1
                         msleft = (levelkey[level][0]) * 1000
                         lfadeprogress = 0
+                        wfadeprogress = 0
                         menuopen = False
                         gameover = False
                         soundplayed = False
@@ -289,7 +304,7 @@ while running == True:
             i += 1
             screen.blit(render, (60, 400 + (10 + (render.get_rect().height))*i))
 
-    if tutorialopen == False and menuopen == False and levelup == False and freeplay == False and cheats == False:
+    if tutorialopen == False and menuopen == False and levelup == False and freeplay == False and cheats == False and win == False and gameover == False:
         msleft -= dt
     if msleft <= 0:
         msleft = 0
@@ -323,7 +338,7 @@ while running == True:
         mousex, mousey = pygame.mouse.get_pos()
         screen.blit(crosshair, (mousex - crosshairrect.width/2, mousey - crosshairrect.height/2))
 
-    if cheats == False and ((destroy == 0 and freeplay == False) or freeplay == True) and (GameTools.game_over(matrix) == True or gameover == True):
+    if cheats == False and win == False and ((gameover == True and freeplay == False) or (freeplay == True and GameTools.game_over(matrix) == True) or (freeplay == False and destroy == 0 and GameTools.game_over(matrix) == True)):
         pygame.mixer.music.stop()
         powerup = ""
         dmitritext = defaulttext
@@ -384,7 +399,6 @@ while running == True:
 
     if blink < 10 and levelup == True:
         if blink == 0:
-            levelupsound = pygame.mixer.Sound("levelupsound.mp3")
             pygame.mixer.Sound.play(levelupsound)
         if blink % 2 == 0 and plinks < 90:
             blinker = pygame.Surface((1280, 720))
@@ -402,7 +416,6 @@ while running == True:
         delthreshold = 32
 
     if tutorialopen == True:
-        tutorial_display = pygame.image.load("tutorialscreen.png").convert_alpha()
         screen.blit(tutorial_display, (0, 0))
 
     if win == True and wfadeprogress >= 256:
