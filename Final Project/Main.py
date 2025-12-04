@@ -31,6 +31,7 @@ backgroundmusic = pygame.mixer.music.load("backgroundmusic.mp3")
 glassbreak = pygame.mixer.Sound("glassbreak.mp3")
 winsound = pygame.mixer.Sound("winsound.mp3")
 delsound = pygame.mixer.Sound("delete.mp3")
+multsound = pygame.mixer.Sound("multiply.mp3")
 levelupsound = pygame.mixer.Sound("levelupsound.mp3")
 
 scanlines = pygame.image.load("overlay.png").convert_alpha()
@@ -139,19 +140,23 @@ while running == True:
                         offsetx += 160
                     if rect.collidepoint(event.pos):
                         if powerup == "destroy" and 0 < matrix[tile]:
-                            matrix[tile] = 0
-                            powerup = ""
                             if cheats == False:
+                                matrix[tile] = 0
+                                powerup = ""
                                 destroy -= 1
+                                dmitritext = defaulttext
+                            if cheats == True:
+                                matrix[tile] = 0
                             delsound.play()
-                            dmitritext = defaulttext
                         elif cheats == False and powerup == "multiply" and matrix[tile] < 128 and matrix[tile] > 0:
                             matrix[tile] *= 2
                             powerup = ""
                             multiply -= 1
                             dmitritext = defaulttext
+                            multsound.play()
                         elif cheats == True and powerup == "multiply" and matrix[tile] > 0:
                             matrix[tile] *= 2
+                            multsound.play()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     oldmatrix = matrix.copy()
@@ -395,6 +400,7 @@ while running == True:
         screen.blit(scanlines, (0, 0))
 
     if cheats == True and win == False:
+        msleft = (levelkey[level][0]) * 1000
         screen.blit(cheatoverlay, (0, 0))
 
     if blink < 10 and levelup == True:
