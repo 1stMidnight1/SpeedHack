@@ -44,6 +44,17 @@ menurestartimage = pygame.image.load("menurestart.png").convert_alpha()
 menuexitimage = pygame.image.load("menuexit.png").convert_alpha()
 tutorial_display = pygame.image.load("tutorialscreen.png").convert_alpha()
 
+tut1 = pygame.image.load("tut1.png").convert_alpha()
+tut2 = pygame.image.load("tut2.png").convert_alpha()
+tut3 = pygame.image.load("tut3.png").convert_alpha()
+tut4 = pygame.image.load("tut4.png").convert_alpha()
+tut5 = pygame.image.load("tut5.png").convert_alpha()
+tut6 = pygame.image.load("tut6.png").convert_alpha()
+tut7 = pygame.image.load("tut7.png").convert_alpha()
+tut8 = pygame.image.load("tut8.png").convert_alpha()
+tut9 = pygame.image.load("tut9.png").convert_alpha()
+
+
 timer_font = pygame.font.Font("mono.ttf", 64)
 objective_font = pygame.font.Font("mono.ttf", 32)
 dmitri_font = pygame.font.Font("mono.ttf", 18)
@@ -118,6 +129,7 @@ tutorialopen = False
 powerup = ""
 destroy = 0
 multiply = 0
+slide = 1
 
 pygame.mixer.music.play(-1)
 GameTools.new_tile(matrix)
@@ -182,6 +194,8 @@ while running == True:
                     if cheats == True:
                         cheats = False
                     else: cheats = True
+                elif event.key == pygame.K_1:
+                    tutorialopen = True
                 elif event.key == pygame.K_2 and (freeplay == False or cheats == True):
                     if cheats == True or destroy > 0:
                         powerup = "destroy"
@@ -238,7 +252,16 @@ while running == True:
                     dmitritext = defaulttext
                 elif event.key == pygame.K_ESCAPE and not powerup:
                     menuopen = True
-
+        elif tutorialopen == True:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_1:
+                    tutorialopen = False
+                elif event.key == pygame.K_LEFT:
+                    if slide > 1:
+                        slide -= 1
+                elif event.key == pygame.K_RIGHT:
+                    if slide < 9:
+                        slide += 1
         elif menuopen == True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -268,15 +291,6 @@ while running == True:
                         pygame.mixer.music.play(-1)
                     elif menuexit == True:
                         running = False
-
-        if tutorialopen == False:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    tutorialopen = True
-        else:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1 or event.key == pygame.K_ESCAPE:
-                    tutorialopen = False
 
         for tile in matrix.values():
             if tile >= delthreshold:
@@ -421,8 +435,28 @@ while running == True:
         destroy = 0
         delthreshold = 32
 
+    if tutorialopen == False:
+        slide = 1
+
     if tutorialopen == True:
-        screen.blit(tutorial_display, (0, 0))
+        if slide == 1:
+            screen.blit(tut1, (0, 0))
+        if slide == 2:
+            screen.blit(tut2, (0, 0))
+        if slide == 3:
+            screen.blit(tut3, (0, 0))
+        if slide == 4:
+            screen.blit(tut4, (0, 0))
+        if slide == 5:
+            screen.blit(tut5, (0, 0))
+        if slide == 6:
+            screen.blit(tut6, (0, 0))
+        if slide == 7:
+            screen.blit(tut7, (0, 0))
+        if slide == 8:
+            screen.blit(tut8, (0, 0))
+        if slide == 9:
+            screen.blit(tut9, (0, 0))
 
     if win == True and wfadeprogress >= 256:
         screen.blit(winoverlay, (0, 0))
