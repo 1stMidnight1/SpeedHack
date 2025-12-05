@@ -42,7 +42,6 @@ cheatoverlay = pygame.image.load("cheatoverlay.png").convert_alpha()
 main_background = pygame.image.load("background.png").convert_alpha()
 menurestartimage = pygame.image.load("menurestart.png").convert_alpha()
 menuexitimage = pygame.image.load("menuexit.png").convert_alpha()
-tutorial_display = pygame.image.load("tutorialscreen.png").convert_alpha()
 
 tut1 = pygame.image.load("tut1.png").convert_alpha()
 tut2 = pygame.image.load("tut2.png").convert_alpha()
